@@ -12,6 +12,8 @@
 
 .modal-overlay {
     transition: opacity 0.3s ease-out;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .modal-overlay.hidden {
@@ -233,10 +235,55 @@
 
 
 /* ============================================
-   9. RESPONSIVE DESIGN
+   9. PAGINATION STYLES
+   ============================================ */
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.pagination-btn:hover {
+    color: #1f2937;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(75, 85, 99, 0.15);
+}
+
+.pagination-btn.active {
+    background-color: #D4A373;
+    border-color: #D4A373;
+    color: #ffffff;
+    box-shadow: 0 8px 14px rgba(212, 163, 115, 0.3);
+}
+
+.pagination-btn.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.pagination-btn i {
+    pointer-events: none;
+}
+
+
+/* ============================================
+   10. RESPONSIVE DESIGN
    ============================================ */
 
 @media (max-width: 640px) {
+
     /* Table row responsive sizing */
     .table-row-hover td,
     .table-row-hover th {

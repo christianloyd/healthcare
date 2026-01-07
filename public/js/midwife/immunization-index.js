@@ -107,12 +107,69 @@ function openViewModal(immunization) {
     }
 
     try {
-        // Populate modal fields
+        // Populate patient information
         updateElementText('modalChildName', immunization.child_record?.full_name);
+
+        // Calculate and display age
+        if (immunization.child_record?.birthdate) {
+            const birthDate = new Date(immunization.child_record.birthdate);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            // Format age appropriately
+            if (age < 1) {
+                const months = monthDiff < 0 ? 12 + monthDiff : monthDiff;
+                updateElementText('modalChildAge', `${months} month${months !== 1 ? 's' : ''}`);
+            } else {
+                updateElementText('modalChildAge', `${age} year${age !== 1 ? 's' : ''}`);
+            }
+        } else {
+            updateElementText('modalChildAge', 'N/A');
+        }
+
+        // Display gender
+        updateElementText('modalChildGender', immunization.child_record?.gender || 'N/A');
+
+        // Display mother's name
+        updateElementText('modalMotherName', immunization.child_record?.mother_name || 'N/A');
+
+        // Populate vaccine information
         updateElementText('modalVaccineName', immunization.vaccine_name);
         updateElementText('modalDose', immunization.dose);
-        updateElementText('modalStatus', immunization.status);
         updateElementText('modalNotes', immunization.notes);
+
+        // Update status with badge styling
+        const statusElement = document.getElementById('modalStatus');
+        const statusTextElement = document.getElementById('modalStatusText');
+        const statusIconElement = document.getElementById('modalStatusIcon');
+
+        if (statusElement && statusTextElement && statusIconElement) {
+            const status = immunization.status;
+            statusTextElement.textContent = status;
+
+            // Remove all status classes
+            statusElement.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold';
+
+            // Apply status-specific styling
+            if (status === 'Done') {
+                statusElement.classList.add('bg-green-100', 'text-green-800');
+                statusIconElement.className = 'fas fa-check-circle mr-1';
+            } else if (status === 'Upcoming') {
+                statusElement.classList.add('bg-blue-100', 'text-blue-800');
+                statusIconElement.className = 'fas fa-clock mr-1';
+            } else if (status === 'Missed') {
+                statusElement.classList.add('bg-red-100', 'text-red-800');
+                statusIconElement.className = 'fas fa-times-circle mr-1';
+            } else {
+                statusElement.classList.add('bg-gray-100', 'text-gray-800');
+                statusIconElement.className = 'fas fa-question-circle mr-1';
+            }
+        }
 
         // Format and display schedule date
         if (immunization.schedule_date) {
@@ -650,15 +707,15 @@ function setupFormHandling(form, submitBtn, loadingText) {
 
     const inputs = form.querySelectorAll('input, textarea, select');
     inputs.forEach(input => {
-        input.addEventListener('blur', function() {
+        input.addEventListener('blur', function () {
             validateField(this);
         });
-        input.addEventListener('input', function() {
+        input.addEventListener('input', function () {
             this.classList.remove('error-border');
         });
     });
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         e.preventDefault(); // Prevent default form submission
 
         const originalText = submitBtn.innerHTML;
@@ -684,71 +741,71 @@ function setupFormHandling(form, submitBtn, loadingText) {
                 'Accept': 'application/json'
             }
         })
-        .then(response => response.json().then(data => ({status: response.status, body: data})))
-        .then(result => {
-            // Restore button
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(result => {
+                // Restore button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
 
-            if (result.status === 200 && result.body.success) {
-                // Close modal ONLY on success
-                closeModal();
+                if (result.status === 200 && result.body.success) {
+                    // Close modal ONLY on success
+                    closeModal();
 
-                // Show success SweetAlert
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: result.body.message || 'Immunization schedule created successfully!',
-                    confirmButtonColor: '#68727A',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Reload page to show new data
-                    window.location.reload();
-                });
-            } else {
-                // DON'T close modal - keep it open for corrections
-                // Format validation errors
-                let errorMessage = '';
-                if (result.body.errors) {
-                    // Laravel validation errors format
-                    errorMessage = '<div class="text-left"><strong>Please correct the following errors:</strong><ul class="mt-2 ml-4 list-disc">';
-                    Object.keys(result.body.errors).forEach(key => {
-                        result.body.errors[key].forEach(error => {
-                            errorMessage += `<li class="mb-1">${error}</li>`;
-                        });
+                    // Show success SweetAlert
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: result.body.message || 'Immunization schedule created successfully!',
+                        confirmButtonColor: '#68727A',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload page to show new data
+                        window.location.reload();
                     });
-                    errorMessage += '</ul></div>';
                 } else {
-                    errorMessage = result.body.message || 'Please correct the errors and try again.';
-                }
+                    // DON'T close modal - keep it open for corrections
+                    // Format validation errors
+                    let errorMessage = '';
+                    if (result.body.errors) {
+                        // Laravel validation errors format
+                        errorMessage = '<div class="text-left"><strong>Please correct the following errors:</strong><ul class="mt-2 ml-4 list-disc">';
+                        Object.keys(result.body.errors).forEach(key => {
+                            result.body.errors[key].forEach(error => {
+                                errorMessage += `<li class="mb-1">${error}</li>`;
+                            });
+                        });
+                        errorMessage += '</ul></div>';
+                    } else {
+                        errorMessage = result.body.message || 'Please correct the errors and try again.';
+                    }
 
-                // Show validation error with SweetAlert (modal stays open in background)
+                    // Show validation error with SweetAlert (modal stays open in background)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: errorMessage,
+                        confirmButtonColor: '#68727A',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                // Restore button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+
+                // Show error SweetAlert
                 Swal.fire({
                     icon: 'error',
-                    title: 'Validation Error',
-                    html: errorMessage,
+                    title: 'Error',
+                    text: 'An unexpected error occurred. Please try again.',
                     confirmButtonColor: '#68727A',
-                    confirmButtonText: 'OK',
-                    allowOutsideClick: false
+                    confirmButtonText: 'OK'
                 });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-
-            // Restore button
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-
-            // Show error SweetAlert
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An unexpected error occurred. Please try again.',
-                confirmButtonColor: '#68727A',
-                confirmButtonText: 'OK'
             });
-        });
     });
 }
 
@@ -815,7 +872,7 @@ function showError(message) {
    13. DOCUMENT INITIALIZATION
    ============================================ */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Setup form handling for Add form
     const addForm = document.getElementById('immunizationForm');
     const addSubmitBtn = document.getElementById('submit-btn');
@@ -834,7 +891,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setDateConstraints();
 
     // Close modals on Escape key
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             closeModal();
             closeEditModal();
@@ -850,7 +907,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup mark missed reschedule checkbox
     const missedRescheduleCheckbox = document.getElementById('missed-reschedule-checkbox');
     if (missedRescheduleCheckbox) {
-        missedRescheduleCheckbox.addEventListener('change', function() {
+        missedRescheduleCheckbox.addEventListener('change', function () {
             const rescheduleFields = document.getElementById('reschedule-fields');
             const dateInput = document.getElementById('missed-reschedule-date');
             const timeInput = document.getElementById('missed-reschedule-time');
@@ -872,7 +929,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup mark missed form submission
     const markMissedForm = document.getElementById('markMissedForm');
     if (markMissedForm) {
-        markMissedForm.addEventListener('submit', function(e) {
+        markMissedForm.addEventListener('submit', function (e) {
             if (!document.getElementById('missed-confirm-checkbox').checked) {
                 e.preventDefault();
                 showError('Please confirm by checking the checkbox');
@@ -890,7 +947,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup mark done modal click outside
     const doneModal = document.getElementById('markDoneModal');
     if (doneModal) {
-        doneModal.addEventListener('click', function(e) {
+        doneModal.addEventListener('click', function (e) {
             if (e.target === this) {
                 closeMarkDoneModal();
             }

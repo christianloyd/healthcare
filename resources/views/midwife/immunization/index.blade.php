@@ -17,9 +17,11 @@
          <div> </div>
         <div class="flex space-x-3">
             <button onclick="openAddModal()"
-                class="btn-minimal btn-primary-clean px-4 py-2 rounded-lg font-medium flex items-center space-x-2">
-                <i class="fas fa-plus text-sm"></i>
-                <span> Add Schedule</span>
+                class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-all duration-200 flex items-center btn-primary">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+                </svg>
+                Add Schedule
             </button>
 
             <!-- Test Toast Button (Remove in production) -->
@@ -160,11 +162,17 @@
                                 @php
                                     $immunizationData = [
                                         'id' => $immunization->id,
-                                        'child_record' => ['full_name' => $immunization->childRecord->full_name ?? 'Unknown'],
+                                        'child_record' => [
+                                            'full_name' => $immunization->childRecord->full_name ?? 'Unknown',
+                                            'birthdate' => $immunization->childRecord->birthdate ?? null,
+                                            'gender' => $immunization->childRecord->gender ?? null,
+                                            'mother_name' => $immunization->childRecord->mother->name ?? 'N/A'
+                                        ],
                                         'vaccine' => ['name' => $immunization->vaccine->name ?? $immunization->vaccine_name],
                                         'vaccine_name' => $immunization->vaccine_name,
                                         'dose' => $immunization->dose,
                                         'schedule_date' => $immunization->schedule_date,
+                                        'schedule_time' => $immunization->schedule_time,
                                         'status' => $immunization->status,
                                         'notes' => $immunization->notes,
                                         'batch_number' => $immunization->batch_number,
@@ -245,8 +253,54 @@
             </div>
             
             <!-- Pagination -->
-            <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 overflow-x-auto">
-                {{ $immunizations->links() }}
+            @php
+                $paginator = $immunizations;
+                $currentPage = $paginator->currentPage();
+                $lastPage = max(1, $paginator->lastPage());
+            @endphp
+
+            <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between text-sm text-gray-600">
+                <div>
+                    Showing
+                    <span class="font-medium">{{ $paginator->firstItem() ?? ($paginator->count() ? 1 : 0) }}</span>
+                    to
+                    <span class="font-medium">{{ $paginator->lastItem() ?? $paginator->count() }}</span>
+                    of
+                    <span class="font-medium">{{ $paginator->total() }}</span>
+                    results
+                </div>
+
+                <nav class="inline-flex items-center gap-1" role="navigation" aria-label="Pagination">
+                    @php $prevDisabled = $paginator->onFirstPage(); @endphp
+                    <a
+                        href="{{ $prevDisabled ? '#' : $paginator->previousPageUrl() }}"
+                        class="pagination-btn {{ $prevDisabled ? 'disabled' : '' }}"
+                        aria-disabled="{{ $prevDisabled ? 'true' : 'false' }}"
+                        aria-label="Previous page"
+                    >
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+
+                    @for ($page = 1; $page <= $lastPage; $page++)
+                        <a
+                            href="{{ $paginator->url($page) }}"
+                            class="pagination-btn {{ $page === $currentPage ? 'active' : '' }}"
+                            aria-current="{{ $page === $currentPage ? 'page' : 'false' }}"
+                        >
+                            {{ $page }}
+                        </a>
+                    @endfor
+
+                    @php $nextDisabled = !$paginator->hasMorePages(); @endphp
+                    <a
+                        href="{{ $nextDisabled ? '#' : $paginator->nextPageUrl() }}"
+                        class="pagination-btn {{ $nextDisabled ? 'disabled' : '' }}"
+                        aria-disabled="{{ $nextDisabled ? 'true' : 'false' }}"
+                        aria-label="Next page"
+                    >
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </nav>
             </div>
         @else
             <!-- Empty State -->
@@ -262,7 +316,7 @@
                         Get started by scheduling the first immunization.
                     @endif
                 </p>
-                <button onclick="openAddModal()" class="btn-minimal btn-primary-clean px-6 py-3 rounded-lg font-medium inline-flex items-center">
+                <button onclick="openAddModal()" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-all duration-200 inline-flex items-center btn-primary">
                     <i class="fas fa-plus mr-2"></i>Schedule Immunization
                 </button>
             </div>

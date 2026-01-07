@@ -166,7 +166,7 @@
 
             <div class="flex flex-col sm:flex-row justify-center gap-4">
                 <button onclick="showMotherForm(true)" type="button"
-                        class="btn-primary-clean px-8 py-4 rounded-lg font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
+                        class="bg-primary text-white px-8 py-4 rounded-lg font-medium hover:bg-primary-dark transition-all shadow-md hover:shadow-lg">
                     <i class="fas fa-check mr-2"></i>Yes, Select Existing Mother
                 </button>
                 <button onclick="showMotherForm(false)" type="button"
@@ -425,7 +425,7 @@
                     <i class="fas fa-times mr-2"></i>Cancel
                 </a>
                 <button type="submit" id="submit-btn"
-                        class="btn-primary-clean px-6 py-3 rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                        class="bg-primary text-white px-6 py-3 rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
                     <i class="fas fa-save mr-2"></i>Save Child Record
                 </button>
             </div>

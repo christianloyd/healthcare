@@ -189,7 +189,7 @@
                 <button type="button" onclick="closeModal()" class="btn-minimal px-6 py-2.5 text-gray-600 border border-gray-300 rounded-lg">
                     Cancel
                 </button>
-                <button type="submit" id="submit-btn" class="btn-minimal btn-primary-clean px-6 py-2.5 rounded-lg font-medium">
+                <button type="submit" id="submit-btn" class="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all duration-200 font-medium">
                     <i class="fas fa-save mr-2"></i>Save User
                 </button>
             </div>

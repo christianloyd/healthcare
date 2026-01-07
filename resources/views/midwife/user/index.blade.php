@@ -65,8 +65,10 @@
     </div>
     <div class="flex space-x-3">
         <button onclick="openAddModal()"
-            class="btn-minimal btn-primary-clean px-4 py-2 rounded-lg font-medium flex items-center space-x-2">
-            <i class="fas fa-plus text-sm"></i>
+            class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-all duration-200 flex items-center space-x-2">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+            </svg>
             <span>Add User</span>
         </button>
     </div>
@@ -102,7 +104,7 @@
                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                     <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                 </select>
-                <button type="submit" onclick="showSkeletonLoaders()" class="btn-minimal px-4 py-2.5 bg-[#68727A] text-white rounded-lg">
+                <button type="submit" onclick="showSkeletonLoaders()" class="btn-minimal px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all duration-200">
                     <i class="fas fa-filter mr-2"></i>Filter
                 </button>
                 <a href="{{ route('midwife.user.index') }}" class="btn-minimal px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg text-center">

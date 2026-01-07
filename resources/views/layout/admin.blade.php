@@ -43,7 +43,7 @@
 
     <style>
         /* Import Inter font for system-wide use - optimized weights only */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'); */
 
         /* Apply Inter font system-wide */
         * {

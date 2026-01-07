@@ -13,7 +13,14 @@ window.Chart = Chart;
 
 // Import SweetAlert2
 import Swal from 'sweetalert2';
+import 'sweetalert2/src/sweetalert2.scss';
 window.Swal = Swal;
+
+// Import Inter Font
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
 
 // Import Alpine.js
 import Alpine from 'alpinejs';

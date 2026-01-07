@@ -172,7 +172,7 @@
                     Cancel
                 </button>
                 <button type="submit" id="submit-btn"
-                        class="px-6 py-3 bg-[#68727A] text-white rounded-lg hover:bg-[#5a6470] transition-colors flex items-center">
+                        class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center">
                     <i class="fas fa-calendar-plus mr-2"></i>
                     Schedule Immunization
                 </button>
