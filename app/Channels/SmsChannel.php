@@ -57,7 +57,7 @@ class SmsChannel
         }
 
         // Send the SMS
-        $result = $this->smsService->sendSms($phoneNumber, $message);
+        $result = $this->smsService->sendSms($phoneNumber, $message, $notification->smsType ?? 'general');
 
         // Log the result
         if ($result['success']) {

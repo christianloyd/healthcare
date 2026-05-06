@@ -39,9 +39,12 @@ return [
         'redirect_uri' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'textbee' => [
+        'api_key' => env('TEXTBEE_API_KEY'),
+        'device_id' => env('TEXTBEE_DEVICE_ID'),
+    ],
+
     'iprog' => [
-        'api_token' => env('IPROG_API_TOKEN'),
-        'api_url' => env('IPROG_API_URL', 'https://www.iprogsms.com/api/v1/sms_messages'),
         'sender_name' => env('IPROG_SENDER_NAME', 'HealthCare System'),
     ],
 

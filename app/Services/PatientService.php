@@ -35,7 +35,16 @@ class PatientService
             $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
 
             // Create the patient record
-            $patient = Patient::create($data);
+            $patient = new Patient($data);
+            
+            // Set historical registration date if provided
+            if (!empty($data['registration_date'])) {
+                $registrationDate = \Carbon\Carbon::parse($data['registration_date']);
+                $patient->created_at = $registrationDate;
+                $patient->updated_at = $registrationDate;
+            }
+            
+            $patient->save();
 
             // Send notifications
             $this->notifyPatientCreated($patient);

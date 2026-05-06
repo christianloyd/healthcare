@@ -135,7 +135,8 @@ class NotificationService
                         'schedule_time' => $immunization->schedule_time,
                         'type' => 'immunization_reminder'
                     ],
-                    true
+                    true,
+                    'vaccination_reminder'
                 ));
 
                 Log::info('Day-before immunization reminder sent to guardian', [
@@ -221,7 +222,8 @@ class NotificationService
                         'next_visit_date' => $appointmentDate,
                         'type' => 'reminder'
                     ],
-                    true // Enable SMS
+                    true, // Enable SMS
+                    'appointment_reminder'
                 ));
 
                 Log::info("Day-before SMS reminder sent to patient: {$patientName} ({$patient->contact}) for next visit: {$appointmentDate}");
@@ -298,7 +300,8 @@ class NotificationService
                         'child_id' => $child->id,
                         'child_name' => $child->full_name
                     ],
-                    true // Enable SMS for mother
+                    true, // Enable SMS for mother
+                    'vaccination_reminder'
                 ));
 
                 Log::info("SMS vaccination reminder sent to mother of {$child->full_name} ({$mother->contact})");

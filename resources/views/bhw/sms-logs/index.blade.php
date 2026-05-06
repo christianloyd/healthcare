@@ -7,8 +7,48 @@
     <!-- Header -->
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900">SMS Logs</h1>
-        <p class="text-gray-600 mt-1">Monitor all SMS messages sent from the system</p>
+        <div class="flex justify-between items-center mt-1">
+            <p class="text-gray-600">Monitor all SMS messages sent from the system</p>
+            <button id="btnTriggerReminders" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm transition-all flex items-center">
+                <i class="fas fa-paper-plane mr-2"></i> Send Day-Before Reminders Now
+            </button>
+        </div>
     </div>
+
+    <script>
+        document.getElementById('btnTriggerReminders').addEventListener('click', function() {
+            showConfirmation(
+                'Send Day-Before Reminders',
+                'This will scan for all checkups and vaccinations scheduled for tomorrow and send SMS reminders. Continue?',
+                function() {
+                    // On Confirm
+                    showLoading('Sending reminders...');
+                    
+                    fetch("{{ url('notifications/trigger-checks') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccess(data.message, function() {
+                                location.reload();
+                            });
+                        } else {
+                            showError('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showError('An error occurred while sending reminders.');
+                    });
+                }
+            );
+        });
+    </script>
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

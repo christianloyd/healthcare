@@ -10,15 +10,15 @@ use Exception;
 
 class SmsService
 {
-    protected $apiToken;
-    protected $apiUrl;
+    protected $apiKey;
+    protected $deviceId;
     protected $senderName;
 
     public function __construct()
     {
-        $this->apiToken = config('services.iprog.api_token');
-        $this->apiUrl = config('services.iprog.api_url');
-        $this->senderName = config('services.iprog.sender_name');
+        $this->apiKey = config('services.textbee.api_key');
+        $this->deviceId = config('services.textbee.device_id');
+        $this->senderName = config('services.iprog.sender_name', 'HealthCare System');
     }
 
     /**
@@ -55,19 +55,17 @@ class SmsService
                 'type' => $type
             ]);
 
-            // Make API request to IPROG
+            // Make API request to Textbee
             $response = Http::timeout(30)
                 ->withoutVerifying() // Bypass SSL verification (for development/XAMPP)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
+                    'x-api-key' => $this->apiKey,
                 ])
-                ->post($this->apiUrl, [
-                    'api_token' => $this->apiToken,
-                    'phone_number' => $formattedNumber,
+                ->post("https://api.textbee.dev/api/v1/gateway/devices/{$this->deviceId}/sendSMS", [
+                    'recipients' => [$formattedNumber],
                     'message' => $message,
-                    'sender_name' => $this->senderName,
-
                 ]);
 
             // Check if request was successful
@@ -330,8 +328,8 @@ class SmsService
         // You can check your balance on the IPROG dashboard
         return [
             'success' => true,
-            'message' => 'Check balance at IPROG dashboard',
-            'url' => 'https://sms.iprogtech.com'
+            'message' => 'Check status at Textbee dashboard',
+            'url' => 'https://dashboard.textbee.dev'
         ];
     }
 }

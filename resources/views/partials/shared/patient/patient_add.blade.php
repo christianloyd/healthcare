@@ -107,6 +107,16 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Registration Date (Optional)</label>
+                    <input type="date" name="registration_date" id="add-registration-date" max="{{ date('Y-m-d') }}" value="{{ old('registration_date') }}"
+                        class="form-input w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-primary @error('registration_date') error-border @enderror">
+                    <p class="text-xs text-gray-500 mt-1">Leave blank for current date</p>
+                    @error('registration_date')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
                     <select name="address" id="add-address" required

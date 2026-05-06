@@ -278,14 +278,14 @@ class ReportController extends Controller
             '' => 'All Data' // Default option to show all data
         ];
         
-        $startDate = Carbon::now()->subMonths(11);
+        $startDate = Carbon::now()->subMonths(35);
         
-        for ($i = 0; $i < 12; $i++) {
+        for ($i = 0; $i < 36; $i++) {
             $date = $startDate->copy()->addMonths($i);
             $months[$date->format('Y-m')] = $date->format('F Y');
         }
         
-        return $months;
+        return array_reverse($months, true); // Show newest months first
     }
 
     private function getDepartmentMultiplier($department)

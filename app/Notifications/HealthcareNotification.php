@@ -18,11 +18,12 @@ class HealthcareNotification extends Notification
     public $actionUrl;
     public $data;
     public $sendSms;
+    public $smsType;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($title, $message, $type = 'info', $actionUrl = null, $data = [], $sendSms = false)
+    public function __construct($title, $message, $type = 'info', $actionUrl = null, $data = [], $sendSms = false, $smsType = 'general')
     {
         $this->title = $title;
         $this->message = $message;
@@ -30,6 +31,7 @@ class HealthcareNotification extends Notification
         $this->actionUrl = $actionUrl;
         $this->data = $data;
         $this->sendSms = $sendSms; // Enable/disable SMS notification
+        $this->smsType = $smsType; // Type for SMS logging
     }
 
     /**

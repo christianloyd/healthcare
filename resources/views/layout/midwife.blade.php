@@ -897,20 +897,11 @@
                         // Update notification count badge
                         loadNotificationCount();
 
-                        // Animate the bell icon
+                        // Notification visual feedback only (sound disabled to avoid CSP issues)
                         const bellIcon = document.querySelector('.fa-bell');
                         if (bellIcon) {
                             bellIcon.classList.add('ring-bell');
                             setTimeout(() => bellIcon.classList.remove('ring-bell'), 800);
-                        }
-
-                        // Play notification sound if available
-                        try {
-                            const audio = new Audio('data:audio/wav;base64,UklGRnQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-                            audio.volume = 0.3;
-                            audio.play().catch(() => {}); // Ignore errors if audio can't play
-                        } catch (e) {
-                            // Ignore audio errors
                         }
                     } else {
                         // Update timestamp even if no new notifications

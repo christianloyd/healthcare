@@ -760,11 +760,10 @@
     <p style="margin: 0;">Healthcare Management System | Generated: {{ now()->format('F j, Y g:i A') }} | Page <span class="page-number"></span></p>
 </div>
 
+@push('scripts')
 <script>
-    // Chart.js configuration
-    Chart.defaults.font.family = 'Inter';
-    Chart.defaults.font.size = 12;
-    Chart.defaults.color = '#6b7280';
+    // Chart variables
+    let dailyTrendsChart, serviceDistributionChart;
     
     const primaryColor = '#D4A373';
     const secondaryColor = '#ecb99e';
@@ -772,13 +771,8 @@
     const warningColor = '#d97706';
     const infoColor = '#2563eb';
     
-    let dailyTrendsChart, serviceDistributionChart;
-    
     // Initialize charts with error handling (same pattern as dashboard)
     function initializeCharts() {
-        console.log('Chart.js loaded:', typeof Chart !== 'undefined');
-        console.log('Chart Data:', {!! json_encode($charts) !!});
-
         if (typeof Chart === 'undefined') {
             console.error('Chart.js failed to load!');
             // Show fallback message
@@ -787,6 +781,13 @@
             });
             return;
         }
+
+        // Chart.js global configuration
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.font.size = 12;
+        Chart.defaults.color = '#6b7280';
+        console.log('Chart.js loaded:', typeof Chart !== 'undefined');
+        console.log('Chart Data:', {!! json_encode($charts) !!});
 
         console.log('DOM loaded, initializing charts...');
         generateCharts();
@@ -1296,4 +1297,5 @@
         }
     }
 </script>
+@endpush
 @endsection

@@ -56,15 +56,16 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
 
     // Notification routes
-    Route::prefix('notifications')->name('notifications.')->group(function () {
-        Route::get('/', [NotificationController::class, 'index'])->name('index');
-        Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unread-count');
-        Route::get('/recent', [NotificationController::class, 'getRecent'])->name('recent');
-        Route::get('/new', [NotificationController::class, 'getNewNotifications'])->name('new');
-        Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
-        Route::post('/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
-        Route::delete('/{id}', [NotificationController::class, 'delete'])->name('delete');
-        Route::post('/send-test', [NotificationController::class, 'sendTest'])->name('send-test');
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+        Route::get('/recent', [NotificationController::class, 'getRecent'])->name('notifications.recent');
+        Route::get('/new', [NotificationController::class, 'getNewNotifications'])->name('notifications.new');
+        Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+        Route::post('/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+        Route::delete('/{id}', [NotificationController::class, 'delete'])->name('notifications.delete');
+        Route::post('/send-test', [NotificationController::class, 'sendTest'])->name('notifications.send-test');
+        Route::post('/trigger-checks', [NotificationController::class, 'triggerChecks'])->name('notifications.trigger-checks');
     });
 
     /* ----------------------------------------------------------
@@ -283,5 +284,22 @@ Route::get('/seed-vaccines', function() {
         'message' => 'Vaccines seeded successfully!',
         'count' => \App\Models\Vaccine::count(),
         'vaccines' => \App\Models\Vaccine::pluck('name')
+    ]);
+});
+
+// TEMPORARY HISTORICAL SEEDER ROUTE — REMOVE AFTER USE!
+Route::get('/seed-historical', function() {
+    Artisan::call('db:seed', [
+        '--class' => 'HistoricalDataSeeder',
+        '--force' => true
+    ]);
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Historical data (2023-2026) seeded successfully!',
+        'patients_count' => \App\Models\Patient::count(),
+        'prenatal_records_count' => \App\Models\PrenatalRecord::count(),
+        'child_records_count' => \App\Models\ChildRecord::count(),
+        'immunizations_count' => \App\Models\Immunization::where('status', 'Done')->count(),
     ]);
 });

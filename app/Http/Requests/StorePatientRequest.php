@@ -36,6 +36,11 @@ class StorePatientRequest extends FormRequest
                 'required',
                 'string',
                 'max:255'
+            ],
+            'registration_date' => [
+                'nullable',
+                'date',
+                'before_or_equal:today'
             ]
         ];
     }
