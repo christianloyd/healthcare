@@ -78,3 +78,64 @@
 .bg-white {
     background-color: white !important;
 }
+
+/* ============================================
+   PAGINATION STYLES
+   ============================================ */
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.pagination-btn:hover {
+    color: #1f2937;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(75, 85, 99, 0.15);
+}
+
+.pagination-btn.active {
+    background-color: var(--patients-primary);
+    border-color: var(--patients-primary);
+    color: #ffffff;
+    box-shadow: 0 8px 14px rgba(212, 163, 115, 0.3);
+}
+
+.pagination-btn.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.pagination-btn i {
+    pointer-events: none;
+}
+
+.pagination-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #9ca3af;
+    font-weight: 600;
+    user-select: none;
+    cursor: default;
+}
+
+.patients-pagination {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+}
+

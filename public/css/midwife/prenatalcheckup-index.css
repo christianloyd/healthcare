@@ -56,6 +56,44 @@
     outline: none;
 }
 
+/* ── Primary patient-search field ──────────────────────────── */
+/* Prominent styling for the required "Search and Select Patient" input */
+.patient-search-input {
+    width: 100%;
+    min-height: 2.75rem;           /* slightly taller than regular inputs */
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    padding-left: 2.5rem;          /* room for the search icon (pl-10 ≈ 2.5rem) */
+    padding-right: 2.5rem;         /* room for the clear / spinner icon */
+    background-color: #fdfaf7;     /* very light warm tint — signals importance */
+    border: 1.5px solid #b0b8c1;   /* more visible than default 1px gray */
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    color: #1f2937;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.patient-search-input::placeholder {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.patient-search-input:focus {
+    outline: none;
+    border-color: #D4A373;         /* brand warm brown */
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.18);
+    transform: none;               /* override the generic form-input translateY */
+}
+
+.patient-search-input.error {
+    border-color: #ef4444;
+    background-color: #fff5f5;
+}
+
 /* Button Styles */
 .btn-primary {
     transition: all 0.2s ease;
@@ -179,6 +217,23 @@
 
 .pagination-btn i {
     pointer-events: none;
+}
+
+.pagination-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #9ca3af;
+    font-weight: 600;
+    user-select: none;
+    cursor: default;
+}
+
+.checkup-pagination {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
 }
 
 /* Status Badge Styles */

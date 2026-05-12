@@ -163,56 +163,8 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        @php
-            $paginator = $prenatalRecords;
-            $currentPage = $paginator->currentPage();
-            $lastPage = max(1, $paginator->lastPage());
-        @endphp
-
-        <div class="px-6 py-3 border-top border-gray-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between text-sm text-gray-600">
-            <div>
-                Showing
-                <span class="font-medium">{{ $paginator->firstItem() ?? ($paginator->count() ? 1 : 0) }}</span>
-                to
-                <span class="font-medium">{{ $paginator->lastItem() ?? $paginator->count() }}</span>
-                of
-                <span class="font-medium">{{ $paginator->total() }}</span>
-                results
-            </div>
-
-            <nav class="inline-flex items-center gap-1" role="navigation" aria-label="Pagination">
-                @php $prevDisabled = $paginator->onFirstPage(); @endphp
-                <a
-                    href="{{ $prevDisabled ? '#' : $paginator->previousPageUrl() }}"
-                    class="pagination-btn {{ $prevDisabled ? 'disabled' : '' }}"
-                    aria-disabled="{{ $prevDisabled ? 'true' : 'false' }}"
-                    aria-label="Previous page"
-                >
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-
-                @for ($page = 1; $page <= $lastPage; $page++)
-                    <a
-                        href="{{ $paginator->url($page) }}"
-                        class="pagination-btn {{ $page === $currentPage ? 'active' : '' }}"
-                        aria-current="{{ $page === $currentPage ? 'page' : 'false' }}"
-                    >
-                        {{ $page }}
-                    </a>
-                @endfor
-
-                @php $nextDisabled = !$paginator->hasMorePages(); @endphp
-                <a
-                    href="{{ $nextDisabled ? '#' : $paginator->nextPageUrl() }}"
-                    class="pagination-btn {{ $nextDisabled ? 'disabled' : '' }}"
-                    aria-disabled="{{ $nextDisabled ? 'true' : 'false' }}"
-                    aria-label="Next page"
-                >
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </nav>
-        </div>
+        {{-- Pagination --}}
+        @include('components.pagination', ['paginator' => $prenatalRecords])
     </div>
 </div>
 

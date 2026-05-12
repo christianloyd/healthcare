@@ -141,6 +141,23 @@
     pointer-events: none;
 }
 
+.pagination-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #9ca3af;
+    font-weight: 600;
+    user-select: none;
+    cursor: default;
+}
+
+.patients-pagination {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+}
+
 /* ============================================
    BADGE STYLES
    ============================================ */

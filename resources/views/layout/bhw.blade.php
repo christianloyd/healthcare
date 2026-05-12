@@ -379,6 +379,73 @@
             background-color: #D4A373 !important;
         }
 
+        /* ============================================================
+           GLOBAL PAGINATION COMPONENT STYLES
+           Used by components/pagination.blade.php across all tables
+           ============================================================ */
+
+        .pagination-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            color: #4b5563;
+            background-color: #ffffff;
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-decoration: none;
+            flex-shrink: 0;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+            transform: none !important;
+        }
+
+        .pagination-btn:hover:not(.disabled):not(.active) {
+            color: #1f2937;
+            border-color: #9ca3af;
+            box-shadow: 0 2px 8px rgba(75, 85, 99, 0.15);
+        }
+
+        .pagination-btn.active {
+            background-color: #D4A373;
+            border-color: #D4A373;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(212, 163, 115, 0.35);
+            cursor: default;
+        }
+
+        .pagination-btn.disabled {
+            pointer-events: none;
+            opacity: 0.45;
+            cursor: default;
+        }
+
+        .pagination-btn i {
+            pointer-events: none;
+            font-size: 0.7rem;
+        }
+
+        .pagination-ellipsis {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            color: #9ca3af;
+            font-weight: 600;
+            user-select: none;
+            cursor: default;
+            flex-shrink: 0;
+        }
+
+        .table-pagination {
+            flex-wrap: wrap;
+            row-gap: 0.25rem;
+            max-width: 100%;
+        }
+
     </style>
     
     @stack('styles')

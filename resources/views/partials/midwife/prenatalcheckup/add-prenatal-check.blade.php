@@ -43,7 +43,7 @@
                                     <input type="text"
                                            id="patient-search"
                                            placeholder="Type patient name or ID to search..."
-                                           class="form-input pl-10 pr-10 @error('patient_id') error @enderror"
+                                           class="form-input patient-search-input w-full pl-10 pr-10 @error('patient_id') error @enderror"
                                            autocomplete="off">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-search text-gray-400"></i>

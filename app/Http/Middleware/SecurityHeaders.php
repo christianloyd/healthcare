@@ -51,14 +51,14 @@ class SecurityHeaders
         $isDevelopment = config('app.env') !== 'production';
         
         if ($isDevelopment) {
-            // Development: Allow Vite dev server
+            // Development: Allow Vite dev server (on multiple ports if needed) and external fonts
             $csp = implode('; ', [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5173 ws://localhost:5173",
-                "style-src 'self' 'unsafe-inline' http://localhost:5173",
-                "font-src 'self' data: http://localhost:5173",
-                "img-src 'self' data: https:",
-                "connect-src 'self' http://localhost:5173 ws://localhost:5173",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5173 http://localhost:5174 ws://localhost:5173 ws://localhost:5174",
+                "style-src 'self' 'unsafe-inline' http://localhost:5173 http://localhost:5174 https://fonts.googleapis.com",
+                "font-src 'self' data: http://localhost:5173 http://localhost:5174 https://fonts.gstatic.com",
+                "img-src 'self' data: https: http://localhost:5173 http://localhost:5174",
+                "connect-src 'self' http://localhost:5173 http://localhost:5174 ws://localhost:5173 ws://localhost:5174",
                 "frame-ancestors 'none'",
                 "base-uri 'self'",
                 "form-action 'self'",
