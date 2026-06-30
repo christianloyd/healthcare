@@ -102,33 +102,12 @@ class PrenatalCheckupController extends Controller
                 });
         }
 
-        // Optimize: Removed duplicate WHERE clause (was in both with() and whereHas())
-        $patients = Patient::whereHas('prenatalRecords', function($query) {
-            $query->where('is_active', true)
-                  ->where('status', '!=', 'completed');
-        })->with(['prenatalRecords' => function($query) {
-            $query->where('is_active', true)
-                  ->where('status', '!=', 'completed')
-                  ->latest();
-        }, 'prenatalCheckups' => function($query) {
-            $query->orderBy('checkup_date', 'desc')->limit(5); // Limit to recent checkups only
-        }])->get();
-
-        // Get prenatal records for the modal dropdown (exclude completed pregnancies)
-        $prenatalRecords = PrenatalRecord::with('patient')
-            ->where('is_active', true)
-            ->where('status', '!=', 'completed')
-            ->get();
-        
-        // Get users for conducted_by dropdown
-        $healthcareWorkers = User::whereIn('role', ['midwife', 'bhw'])->orderBy('name')->get();
-
         // Return appropriate view based on user role
         $view = auth()->user()->role === 'midwife' 
             ? 'midwife.prenatalcheckup.index' 
             : 'bhw.prenatalcheckup.index';
             
-        return view($view, compact('checkups', 'patients', 'prenatalRecords', 'healthcareWorkers', 'nextCheckups'));
+        return view($view, compact('checkups', 'nextCheckups'));
     }
 
     // Show form to create new prenatal checkup
@@ -526,10 +505,23 @@ class PrenatalCheckupController extends Controller
     public function getPatientsWithActivePrenatalRecords(Request $request)
     {
         try {
-            $patients = Patient::whereHas('prenatalRecords', function($query) {
+            $query = Patient::whereHas('prenatalRecords', function($query) {
                 $query->where('is_active', true)
                       ->where('status', '!=', 'completed');
-            })->get();
+            });
+
+            if ($request->filled('q')) {
+                $term = $request->q;
+                $query->where(function($q) use ($term) {
+                    $q->where('name', 'LIKE', "%{$term}%")
+                      ->orWhere('first_name', 'LIKE', "%{$term}%")
+                      ->orWhere('last_name', 'LIKE', "%{$term}%")
+                      ->orWhere('formatted_patient_id', 'LIKE', "%{$term}%");
+                });
+            }
+
+            // Return limited patients to avoid memory exhaustion
+            $patients = $query->limit(50)->get();
 
             return response()->json($patients);
         } catch (\Exception $e) {

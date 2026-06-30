@@ -30,6 +30,7 @@ function initializePatientSearch() {
     const selectedPatientDisplay = document.getElementById('selected-patient-display');
     const selectedPatientName = document.getElementById('selected-patient-name');
     const selectedPatientDetails = document.getElementById('selected-patient-details');
+    const searchLoading = document.getElementById('search-loading');
 
     if (!searchInput || !selectedPatientId || !searchDropdown) {
         console.warn('Search elements not found, retrying...');
@@ -40,19 +41,6 @@ function initializePatientSearch() {
     console.log('Initializing patient search...');
 
     let searchTimeout;
-    let patients = [];
-
-    // Fetch patients with active prenatal records
-    fetch(window.prenatalRoutes.searchPatients)
-        .then(response => response.json())
-        .then(data => {
-            // Handle Laravel Resource Collection structure
-            patients = data.data || data; // Laravel resources wrap data in 'data' property
-            console.log('Loaded patients:', patients.length);
-        })
-        .catch(error => {
-            console.error('Error fetching patients:', error);
-        });
 
     // Search input handler
     searchInput.addEventListener('input', function() {
@@ -62,17 +50,24 @@ function initializePatientSearch() {
 
         if (query.length < 2) {
             searchDropdown.classList.remove('show');
+            if (searchLoading) searchLoading.classList.add('hidden');
             return;
         }
 
-        searchTimeout = setTimeout(() => {
-            const filteredPatients = patients.filter(patient => {
-                const name = patient.name || (patient.first_name + ' ' + patient.last_name);
-                const id = patient.formatted_patient_id || '';
-                return name.toLowerCase().includes(query) || id.toLowerCase().includes(query);
-            });
+        if (searchLoading) searchLoading.classList.remove('hidden');
 
-            displayResults(filteredPatients);
+        searchTimeout = setTimeout(() => {
+            fetch(`${window.prenatalRoutes.searchPatients}?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const results = data.data || data;
+                    displayResults(results);
+                    if (searchLoading) searchLoading.classList.add('hidden');
+                })
+                .catch(error => {
+                    console.error('Error fetching patients:', error);
+                    if (searchLoading) searchLoading.classList.add('hidden');
+                });
         }, 300);
     });
 

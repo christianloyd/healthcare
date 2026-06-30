@@ -19,7 +19,10 @@ class HistoricalDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('🌱 Starting Historical Data Seeding (2023-2026)...');
+        $currentYear = Carbon::now()->year;
+        $startYear = $currentYear - 3;
+
+        $this->command->info("🌱 Starting Historical Data Seeding ({$startYear}-{$currentYear})...");
 
         $vaccines = Vaccine::all();
         if ($vaccines->isEmpty()) {
@@ -32,15 +35,15 @@ class HistoricalDataSeeder extends Seeder
         $lastNames = ['Santos', 'Reyes', 'Cruz', 'Garcia', 'Mendoza', 'Pascual', 'Dela Cruz', 'Villanueva'];
 
         // Generate data for each year and month
-        for ($year = 2023; $year <= 2026; $year++) {
+        for ($year = $startYear; $year <= $currentYear; $year++) {
             $this->command->info("Processing year: $year");
             
             // Track vaccines used this year to ensure all are used
             $usedVaccinesThisYear = [];
             
             for ($month = 1; $month <= 12; $month++) {
-                // Don't go into future relative to now (May 2026)
-                if ($year == 2026 && $month > 5) break;
+                // Don't go into future relative to now
+                if ($year == $currentYear && $month > Carbon::now()->month) break;
 
                 $this->command->info("  Month: $month");
                 
@@ -115,8 +118,9 @@ class HistoricalDataSeeder extends Seeder
                             ]);
                         }
 
-                        // 4. Create Child Record (High probability if record is older)
-                        if ($year < 2026 || ($year == 2026 && $month < 3)) {
+                        // 4. Create Child Record (High probability if record is older than 3 months)
+                        $monthsSinceRegistration = $registrationDate->diffInMonths(Carbon::now());
+                        if ($monthsSinceRegistration >= 3) {
                             $birthDate = $lmp->copy()->addWeeks(rand(38, 41));
                             if ($birthDate->lt(now())) {
                                 $childFirstName = rand(0, 1) ? 'Junior' : 'Baby';
@@ -164,8 +168,8 @@ class HistoricalDataSeeder extends Seeder
             // Check if any vaccines were missed this year and force some records
             foreach ($vaccines as $v) {
                 if (!isset($usedVaccinesThisYear[$v->id])) {
-                    // Force at least one record for this vaccine in December (or May 2026)
-                    $forceMonth = ($year == 2026) ? 5 : 12;
+                    // Force at least one record for this vaccine in December (or current month)
+                    $forceMonth = ($year == $currentYear) ? Carbon::now()->month : 12;
                     $forceDate = Carbon::create($year, $forceMonth, rand(1, 28));
                     
                     // Create a dummy patient/child for this missing vaccine

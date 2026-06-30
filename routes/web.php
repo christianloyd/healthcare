@@ -18,6 +18,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PrenatalCheckupController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\SystemAnalysisController;
+use App\Http\Controllers\Midwife\TestingController;
 use Illuminate\Support\Facades\Artisan;
 
 
@@ -147,6 +148,12 @@ Route::middleware(['auth'])->group(function () {
 
             // System Analysis Report
             Route::get('/system-analysis-report', [SystemAnalysisController::class, 'generateAnalysisReport'])->name('system.analysis.report');
+
+            // System Load & Stress Testing Routes
+            Route::get('/system-testing', [TestingController::class, 'index'])->name('system-testing.index');
+            Route::post('/system-testing/run', [TestingController::class, 'startTest'])->name('system-testing.run');
+            Route::post('/system-testing/benchmark', [TestingController::class, 'runBenchmark'])->name('system-testing.benchmark');
+            Route::post('/system-testing/purge', [TestingController::class, 'cleanup'])->name('system-testing.purge');
 
             // SMS Logs Routes
             Route::get('/sms-logs', [\App\Http\Controllers\SmsLogController::class, 'index'])->name('sms-logs.index');
