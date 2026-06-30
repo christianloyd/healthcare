@@ -150,7 +150,17 @@ class ReportController extends Controller
         }
         
         // Base statistics
-        $totalPatients = Patient::count();
+        if ($filterDate) {
+            $totalPatients = Patient::whereMonth('created_at', $filterDate->month)
+                                    ->whereYear('created_at', $filterDate->year)
+                                    ->count();
+            $totalChildren = ChildRecord::whereMonth('created_at', $filterDate->month)
+                                        ->whereYear('created_at', $filterDate->year)
+                                        ->count();
+        } else {
+            $totalPatients = Patient::count();
+            $totalChildren = ChildRecord::count();
+        }
 
         // Build checkups query
         $checkupsQuery = PrenatalRecord::query();
@@ -174,7 +184,7 @@ class ReportController extends Controller
             'totalPatients' => $totalPatients,
             'totalCheckups' => $totalCheckups,
             'totalVaccinations' => $totalVaccinations,
-            'totalChildren' => ChildRecord::count(),
+            'totalChildren' => $totalChildren,
             'totalImmunizedGirls' => ChildRecord::where('gender', 'Female')
                                                ->whereHas('immunizations', function($query) use ($filterDate) {
                                                    $query->where('status', 'Done');
@@ -542,7 +552,11 @@ class ReportController extends Controller
             ],
             
             'summary_statistics' => [
-                'total_patients_served' => Patient::count(),
+                'total_patients_served' => $filterDate
+                    ? Patient::whereMonth('created_at', $filterDate->month)
+                             ->whereYear('created_at', $filterDate->year)
+                             ->count()
+                    : Patient::count(),
                 'prenatal_consultations' => $filterDate 
                     ? PrenatalRecord::whereMonth('created_at', $filterDate->month)
                                     ->whereYear('created_at', $filterDate->year)
@@ -589,7 +603,11 @@ class ReportController extends Controller
                                     ->where('status', 'Done')
                                     ->count()
                         : Immunization::where('status', 'Done')->count(),
-                    'nutritional_assessments' => ChildRecord::count() // Placeholder
+                    'nutritional_assessments' => $filterDate
+                        ? ChildRecord::whereMonth('created_at', $filterDate->month)
+                                     ->whereYear('created_at', $filterDate->year)
+                                     ->count()
+                        : ChildRecord::count() // Placeholder
                 ]
             ],
             
@@ -968,16 +986,24 @@ class ReportController extends Controller
     
     private function getBhwCommunityActivities($filterDate)
     {
+        $patientCount = $filterDate 
+            ? Patient::whereMonth('created_at', $filterDate->month)->whereYear('created_at', $filterDate->year)->count()
+            : Patient::count();
+            
+        $prenatalCount = $filterDate
+            ? PrenatalRecord::whereMonth('created_at', $filterDate->month)->whereYear('created_at', $filterDate->year)->count()
+            : PrenatalRecord::count();
+
         // BHW-specific community activities data
         return [
             'home_visits' => [
-                'total' => intval(Patient::count() * 0.3), // Simulate 30% home visit coverage
-                'completed' => intval(Patient::count() * 0.25),
-                'pending' => intval(Patient::count() * 0.05)
+                'total' => intval($patientCount * 0.3), // Simulate 30% home visit coverage
+                'completed' => intval($patientCount * 0.25),
+                'pending' => intval($patientCount * 0.05)
             ],
             'health_education' => [
-                'sessions_conducted' => intval(PrenatalRecord::count() * 0.8),
-                'participants' => intval(Patient::count() * 0.6),
+                'sessions_conducted' => intval($prenatalCount * 0.8),
+                'participants' => intval($patientCount * 0.6),
                 'topics_covered' => 12
             ],
             'referrals' => [
@@ -996,28 +1022,49 @@ class ReportController extends Controller
     
     private function getBhwHomeVisits($filterDate)
     {
+        $patientCount = $filterDate 
+            ? Patient::whereMonth('created_at', $filterDate->month)->whereYear('created_at', $filterDate->year)->count()
+            : Patient::count();
+
         // Simulate home visit data based on patient records
         return [
-            'scheduled' => intval(Patient::count() * 0.4),
-            'completed' => intval(Patient::count() * 0.3),
-            'missed' => intval(Patient::count() * 0.1),
-            'follow_up_needed' => intval(Patient::count() * 0.15)
+            'scheduled' => intval($patientCount * 0.4),
+            'completed' => intval($patientCount * 0.3),
+            'missed' => intval($patientCount * 0.1),
+            'follow_up_needed' => intval($patientCount * 0.15)
         ];
     }
     
     private function getBhwHealthEducation($filterDate)
     {
+        $patientCount = $filterDate 
+            ? Patient::whereMonth('created_at', $filterDate->month)->whereYear('created_at', $filterDate->year)->count()
+            : Patient::count();
+        $prenatalCount = $filterDate
+            ? PrenatalRecord::whereMonth('created_at', $filterDate->month)->whereYear('created_at', $filterDate->year)->count()
+            : PrenatalRecord::count();
+        $childCount = $filterDate
+            ? ChildRecord::whereMonth('created_at', $filterDate->month)->whereYear('created_at', $filterDate->year)->count()
+            : ChildRecord::count();
+
         // Health education activities specific to BHW role
         return [
-            'prenatal_education' => PrenatalRecord::count(),
-            'child_nutrition' => ChildRecord::count(),
-            'family_planning' => intval(Patient::count() * 0.4),
-            'immunization_awareness' => intval(ChildRecord::count() * 0.9)
+            'prenatal_education' => $prenatalCount,
+            'child_nutrition' => $childCount,
+            'family_planning' => intval($patientCount * 0.4),
+            'immunization_awareness' => intval($childCount * 0.9)
         ];
     }
     
     private function getBhwCustomReportData($filterDate)
     {
+        $patientCount = $filterDate 
+            ? Patient::whereMonth('created_at', $filterDate->month)->whereYear('created_at', $filterDate->year)->count()
+            : Patient::count();
+        $childCount = $filterDate
+            ? ChildRecord::whereMonth('created_at', $filterDate->month)->whereYear('created_at', $filterDate->year)->count()
+            : ChildRecord::count();
+
         // Custom report data structure for BHW paper format
         return [
             'report_header' => [
@@ -1028,9 +1075,9 @@ class ReportController extends Controller
             ],
             
             'community_coverage' => [
-                'total_households_assigned' => intval(Patient::count() * 1.2), // Assuming 1.2 patients per household
-                'households_visited' => intval(Patient::count() * 0.3),
-                'coverage_percentage' => Patient::count() > 0 ? round((intval(Patient::count() * 0.3) / intval(Patient::count() * 1.2)) * 100, 1) : 0
+                'total_households_assigned' => intval($patientCount * 1.2), // Assuming 1.2 patients per household
+                'households_visited' => intval($patientCount * 0.3),
+                'coverage_percentage' => $patientCount > 0 ? round((intval($patientCount * 0.3) / intval($patientCount * 1.2)) * 100, 1) : 0
             ],
             
             'health_services_delivered' => [
@@ -1063,14 +1110,14 @@ class ReportController extends Controller
                         : ChildRecord::whereHas('immunizations', function($query) {
                             $query->where('status', 'Done');
                         })->distinct()->count(),
-                    'growth_monitoring' => ChildRecord::count(),
-                    'nutrition_counseling' => intval(ChildRecord::count() * 0.8)
+                    'growth_monitoring' => $childCount,
+                    'nutrition_counseling' => intval($childCount * 0.8)
                 ]
             ],
             
             'community_engagement' => [
                 'health_education_sessions' => intval(PrenatalRecord::count() * 0.5),
-                'participants_reached' => intval(Patient::count() * 0.6),
+                'participants_reached' => intval($patientCount * 0.6),
                 'topics_covered' => [
                     'Maternal Health', 'Child Nutrition', 'Family Planning', 
                     'Immunization', 'Disease Prevention', 'Hygiene and Sanitation'
