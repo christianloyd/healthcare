@@ -24,14 +24,11 @@ cmds = [
   'mkdir -p storage/logs',
   'mkdir -p bootstrap/cache',
   'chmod -R 775 storage bootstrap/cache',
-  # Laravel optimization
-  'php artisan config:cache',
-  'php artisan route:cache',
-  'php artisan view:cache',
-  # Final verification
+  # Final verification (NOTE: no config/route/view cache here anymore —
+  # those must run at runtime when DB_HOST etc. actually exist)
   'echo "=== Final manifest check ==="',
   'cat public/build/manifest.json || echo "ERROR: manifest.json not found"'
 ]
 
 [start]
-cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+cmd = "php artisan config:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
