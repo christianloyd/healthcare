@@ -339,7 +339,7 @@
                     </li>
 
                     <!-- Cloud Backup -->
-                    <li>
+                    {{-- <li>
                         <a href="{{ route('admin.cloudbackup.index') }}"
                            class="nav-link flex items-center p-2 sm:p-3 rounded-lg text-sm sm:text-base {{ request()->routeIs('admin.cloudbackup.*') ? 'nav-active bg-primary' : 'hover-cream' }}"
                            data-section="cloud-backup"
@@ -347,7 +347,7 @@
                            <i class="fas fa-cloud-upload-alt w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3"></i>
                             Cloud Backup
                         </a>
-                    </li>
+                    </li> --}}
                 </ul>
             </nav>
 
