@@ -34,12 +34,7 @@ class ChildRecordController extends BaseController
         $query = ChildRecord::query();
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('first_name', 'like', "%{$request->search}%")
-                  ->orWhere('middle_name', 'like', "%{$request->search}%")
-                  ->orWhere('last_name', 'like', "%{$request->search}%")
-                  ->orWhere('phone_number', 'like', "%{$request->search}%");
-            });
+            $query->search($request->search);
         }
 
         if ($request->filled('gender')) $query->where('gender', $request->gender);
@@ -82,12 +77,7 @@ class ChildRecordController extends BaseController
 
         // Apply search filters
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('first_name', 'like', "%{$request->search}%")
-                  ->orWhere('middle_name', 'like', "%{$request->search}%")
-                  ->orWhere('last_name', 'like', "%{$request->search}%")
-                  ->orWhere('phone_number', 'like', "%{$request->search}%");
-            });
+            $query->search($request->search);
         }
 
         if ($request->filled('gender')) {
@@ -97,8 +87,12 @@ class ChildRecordController extends BaseController
         // Apply sorting
         $sortField = $request->get('sort', 'created_at');
         $sortDirection = $request->get('direction', 'desc');
-        if (in_array($sortField, ['first_name', 'last_name', 'birthdate', 'created_at'])) {
-            $query->orderBy($sortField, $sortDirection);
+        if (in_array($sortField, ['child_name', 'birthdate', 'created_at'])) {
+            if ($sortField === 'child_name') {
+                $query->orderBy('first_name', $sortDirection)->orderBy('last_name', $sortDirection);
+            } else {
+                $query->orderBy($sortField, $sortDirection);
+            }
         }
 
         $childRecords = $query->paginate(10)->appends($request->query());

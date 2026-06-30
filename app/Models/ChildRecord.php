@@ -149,6 +149,8 @@ class ChildRecord extends Model
             $q->where('first_name', 'like', "%{$term}%")
               ->orWhere('middle_name', 'like', "%{$term}%")
               ->orWhere('last_name', 'like', "%{$term}%")
+              ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$term}%"])
+              ->orWhereRaw("CONCAT(first_name, ' ', middle_name, ' ', last_name) LIKE ?", ["%{$term}%"])
               ->orWhere('formatted_child_id', 'like', "%{$term}%")
               ->orWhere('phone_number', 'like', "%{$term}%")
               ->orWhere('mother_name', 'like', "%{$term}%")

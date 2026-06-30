@@ -161,7 +161,7 @@ function openAddModal() {
             // Focus will be handled after mother selection
             return;
         } else {
-            firstInput = document.querySelector('#recordForm input[name="child_name"]');
+            firstInput = document.querySelector('#recordForm input[name="first_name"]');
         }
 
         if (firstInput) firstInput.focus();
@@ -1036,8 +1036,10 @@ function setupRealTimeSearch() {
         }
 
         // Make AJAX request
-        // TODO: Replace with actual route configuration
-        const searchUrl = document.body.dataset.searchRoute || '/midwife/childrecord/search';
+        // Dynamic search route resolution from window config
+        const searchUrl = (window.CHILDRECORD_CONFIG && window.CHILDRECORD_CONFIG.searchRoute) 
+            || document.body.dataset.searchRoute 
+            || (window.location.pathname.includes('/bhw') ? '/bhw/childrecord-search' : '/midwife/childrecord-search');
 
         fetch(`${searchUrl}?${params.toString()}`, {
             method: 'GET',
