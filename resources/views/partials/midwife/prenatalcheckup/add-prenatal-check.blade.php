@@ -173,10 +173,10 @@
                                            name="next_visit_date"
                                            id="next_visit_date"
                                            class="input-focus w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                           value="{{ old('next_visit_date') }}"
-                                           min="{{ date('Y-m-d', strtotime('+8 days')) }}"
+                                           value="{{ old('next_visit_date', date('Y-m-d', strtotime('+1 month'))) }}"
+                                           min="{{ date('Y-m-d', strtotime('+28 days')) }}"
                                            required>
-                                    <p class="text-xs text-gray-500 mt-1">Minimum 1 week gap required from today</p>
+                                    <p class="text-xs text-gray-500 mt-1">Next checkup is scheduled monthly (minimum 28 days gap from today)</p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Time *</label>
