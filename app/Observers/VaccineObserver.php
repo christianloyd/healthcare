@@ -21,10 +21,10 @@ class VaccineObserver
     public function updated(Vaccine $vaccine): void
     {
         // Check if stock quantity was updated and is now low
-        if ($vaccine->wasChanged('stock_quantity')) {
-            $threshold = $vaccine->minimum_threshold ?? 10;
+        if ($vaccine->wasChanged('current_stock')) {
+            $threshold = $vaccine->min_stock ?? 10;
             
-            if ($vaccine->stock_quantity <= $threshold && $vaccine->stock_quantity > 0) {
+            if ($vaccine->current_stock <= $threshold && $vaccine->current_stock > 0) {
                 NotificationService::sendLowStockAlert($vaccine);
             }
         }

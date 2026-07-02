@@ -31,6 +31,8 @@
                             <i class="fas fa-edit mr-2"></i>
                             Edit Patient
                         </a>
+                        {{-- TDaP Vaccine Card button (rendered by partial, status badge computed there) --}}
+                        @include('partials.shared.patient.vaccine_card_modal', ['patient' => $patient])
                     </div>
                 </div>
             </div>

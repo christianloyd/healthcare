@@ -24,7 +24,7 @@ class PatientFactory extends Factory
             'last_name' => $lastName,
             'name' => $firstName . ' ' . $lastName,
             'age' => fake()->numberBetween(18, 45),
-            'date_of_birth' => fake()->dateBetween('-45 years', '-18 years'),
+            'date_of_birth' => fake()->dateTimeBetween('-45 years', '-18 years')->format('Y-m-d'),
             'contact' => '09' . fake()->numerify('#########'),
             'emergency_contact' => '09' . fake()->numerify('#########'),
             'address' => fake()->address(),

@@ -157,6 +157,14 @@ class Patient extends Model
     }
 
     /**
+     * Get maternal TDaP vaccine dose records for this patient (mother)
+     */
+    public function maternalImmunizations()
+    {
+        return $this->hasMany(MaternalImmunization::class)->orderBy('dose_number');
+    }
+
+    /**
      * Get next scheduled visit from checkups
      */
     public function nextVisitFromCheckups()
@@ -247,6 +255,31 @@ class Patient extends Model
         }
 
         return $this->prenatalRecords()->count();
+    }
+
+    /**
+     * Get the session count (prenatal checkups) for the active/latest prenatal record.
+     * Active = ONGOING, otherwise = DONE.
+     */
+    public function getPrenatalSessionCountAttribute()
+    {
+        // Prefer the active prenatal record, fall back to the latest
+        if ($this->relationLoaded('activePrenatalRecord') && $this->activePrenatalRecord) {
+            $record = $this->activePrenatalRecord;
+        } else {
+            $record = $this->activePrenatalRecord()->first();
+        }
+
+        if (!$record) {
+            // No active record – count from latest prenatal record
+            $record = $this->prenatalRecords()->latest()->first();
+        }
+
+        if (!$record) {
+            return 0;
+        }
+
+        return $record->prenatalCheckups()->count();
     }
 
     public function getNameAttribute()

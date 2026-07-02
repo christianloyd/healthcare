@@ -56,7 +56,7 @@ class NotificationService
             }
 
             // Send in-app notification to midwives
-            $midwives = User::where('role', 'Midwife')->where('is_active', true)->get();
+            $midwives = User::where('role', 'midwife')->where('is_active', true)->get();
             foreach ($midwives as $midwife) {
                 $midwife->notify(new HealthcareNotification(
                     'New Appointment Scheduled',
@@ -147,7 +147,7 @@ class NotificationService
             }
 
             // Notify midwives in-app (no SMS)
-            $midwives = User::where('role', 'Midwife')->where('is_active', true)->get();
+            $midwives = User::where('role', 'midwife')->where('is_active', true)->get();
             foreach ($midwives as $midwife) {
                 $midwife->notify(new HealthcareNotification(
                     'Immunization Tomorrow',
@@ -230,7 +230,7 @@ class NotificationService
             }
 
             // Send in-app notification to midwives
-            $midwives = User::where('role', 'Midwife')->where('is_active', true)->get();
+            $midwives = User::where('role', 'midwife')->where('is_active', true)->get();
             foreach ($midwives as $midwife) {
                 $midwife->notify(new HealthcareNotification(
                     'Appointment Reminder - Tomorrow',
@@ -267,7 +267,7 @@ class NotificationService
     {
         try {
             // Find all midwives to notify
-            $midwives = User::where('role', 'Midwife')->where('is_active', true)->get();
+            $midwives = User::where('role', 'midwife')->where('is_active', true)->get();
 
             // Send notification to midwives (in-app only)
             foreach ($midwives as $midwife) {
@@ -279,7 +279,7 @@ class NotificationService
                     [
                         'child_id' => $child->id,
                         'child_name' => $child->full_name,
-                        'birth_date' => $child->date_of_birth
+                        'birth_date' => $child->birthdate
                     ],
                     false // No SMS for staff
                 ));
@@ -320,19 +320,19 @@ class NotificationService
     {
         try {
             // Find all midwives to notify
-            $midwives = User::where('role', 'Midwife')->where('is_active', true)->get();
+            $midwives = User::where('role', 'midwife')->where('is_active', true)->get();
             
             foreach ($midwives as $midwife) {
                 $midwife->notify(new HealthcareNotification(
                     'Low Vaccine Stock Alert',
-                    "{$vaccine->vaccine_name} stock is running low. Current stock: {$vaccine->stock_quantity} vials",
+                    "{$vaccine->name} stock is running low. Current stock: {$vaccine->current_stock} vials",
                     'warning',
                     route('midwife.vaccines.index'),
                     [
                         'vaccine_id' => $vaccine->id,
-                        'vaccine_name' => $vaccine->vaccine_name,
-                        'current_stock' => $vaccine->stock_quantity,
-                        'minimum_threshold' => $vaccine->minimum_threshold ?? 10
+                        'vaccine_name' => $vaccine->name,
+                        'current_stock' => $vaccine->current_stock,
+                        'minimum_threshold' => $vaccine->min_stock ?? 10
                     ]
                 ));
                 
@@ -340,7 +340,7 @@ class NotificationService
                 self::clearUserNotificationCache($midwife->id);
             }
             
-            Log::info("Low stock alert sent for vaccine: {$vaccine->vaccine_name}");
+            Log::info("Low stock alert sent for vaccine: {$vaccine->name}");
         } catch (\Exception $e) {
             Log::error("Failed to send low stock alert: " . $e->getMessage());
         }
@@ -353,7 +353,7 @@ class NotificationService
     {
         try {
             // Find all midwives and BHWs to notify
-            $users = User::whereIn('role', ['Midwife', 'BHW'])->where('is_active', true)->get();
+            $users = User::whereIn('role', ['midwife', 'bhw'])->where('is_active', true)->get();
             
             foreach ($users as $user) {
                 $user->notify(new HealthcareNotification(
@@ -385,7 +385,7 @@ class NotificationService
     {
         try {
             // Find all midwives to notify
-            $midwives = User::where('role', 'Midwife')->where('is_active', true)->get();
+            $midwives = User::where('role', 'midwife')->where('is_active', true)->get();
             
             foreach ($midwives as $midwife) {
                 $midwife->notify(new HealthcareNotification(
@@ -512,13 +512,13 @@ class NotificationService
 
             // Get children who might be due for vaccinations
             // This is a simplified check - in reality, you'd have a more complex vaccination schedule
-            $children = ChildRecord::where('date_of_birth', '>=', Carbon::now()->subYears(2))
+            $children = ChildRecord::where('birthdate', '>=', Carbon::now()->subYears(2))
                 ->with(['immunizations'])
                 ->get();
 
             $childrenNeedingVaccination = $children->filter(function ($child) {
                 // Simple logic: if child has fewer than expected immunizations for their age
-                $ageInMonths = Carbon::parse($child->date_of_birth)->diffInMonths(Carbon::now());
+                $ageInMonths = Carbon::parse($child->birthdate)->diffInMonths(Carbon::now());
                 $expectedImmunizations = min(floor($ageInMonths / 2), 12); // Rough estimate
                 
                 return $child->immunizations->count() < $expectedImmunizations;
@@ -540,8 +540,7 @@ class NotificationService
     public static function checkLowVaccineStock()
     {
         try {
-            $lowStockVaccines = Vaccine::where('stock_quantity', '<=', 10) // Threshold of 10 vials
-                ->where('is_active', true)
+            $lowStockVaccines = Vaccine::where('current_stock', '<=', 10) // Threshold of 10 vials
                 ->get();
 
             foreach ($lowStockVaccines as $vaccine) {

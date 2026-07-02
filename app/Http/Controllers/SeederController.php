@@ -69,7 +69,7 @@ class SeederController extends Controller
 
         return response()->json([
             'count' => Vaccine::count(),
-            'vaccines' => Vaccine::select('id', 'name', 'age_schedule', 'stock_quantity')->get()
+            'vaccines' => Vaccine::select('id', 'name', 'age_schedule', 'current_stock')->get()
         ]);
     }
 }

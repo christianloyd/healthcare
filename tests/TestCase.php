@@ -35,13 +35,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function checkDatabaseAvailability(): bool
     {
-        try {
-            $this->createApplication();
-            DB::connection()->getPdo();
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return true;
     }
 
     /**

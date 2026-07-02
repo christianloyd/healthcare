@@ -38,16 +38,20 @@ class PatientRepository implements PatientRepositoryInterface
     }
 
     /**
-     * Get paginated patients with active prenatal records
+     * Get paginated patients, with optional risk status filter.
      *
      * @param int $perPage
+     * @param string|null $riskStatus  'high_risk' | 'normal' | null
      * @return LengthAwarePaginator
      */
-    public function paginate(int $perPage = 20): LengthAwarePaginator
+    public function paginate(int $perPage = 20, ?string $riskStatus = null): LengthAwarePaginator
     {
-        return $this->model->with('activePrenatalRecord')
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+        $query = $this->model->with('activePrenatalRecord');
+
+        $query = $this->applyRiskStatusFilter($query, $riskStatus);
+
+        return $query->orderBy('created_at', 'desc')
+                     ->paginate($perPage);
     }
 
     /**
@@ -150,23 +154,51 @@ class PatientRepository implements PatientRepositoryInterface
     }
 
     /**
-     * Search patients with pagination
+     * Search patients with pagination and optional risk status filter.
      *
      * @param string $term
      * @param int $perPage
+     * @param string|null $riskStatus  'high_risk' | 'normal' | null
      * @return LengthAwarePaginator
      */
-    public function searchPaginated(string $term, int $perPage = 20): LengthAwarePaginator
+    public function searchPaginated(string $term, int $perPage = 20, ?string $riskStatus = null): LengthAwarePaginator
     {
-        return $this->model->where(function($q) use ($term) {
+        $query = $this->model->where(function($q) use ($term) {
             $q->where('first_name', 'LIKE', "%{$term}%")
               ->orWhere('last_name', 'LIKE', "%{$term}%")
               ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$term}%"])
               ->orWhere('formatted_patient_id', 'LIKE', "%{$term}%");
-        })
-        ->with('activePrenatalRecord')
-        ->orderBy('created_at', 'desc')
-        ->paginate($perPage);
+        });
+
+        $query = $this->applyRiskStatusFilter($query, $riskStatus);
+
+        return $query->with('activePrenatalRecord')
+                     ->orderBy('created_at', 'desc')
+                     ->paginate($perPage);
+    }
+
+    /**
+     * Apply a risk-status WHERE clause to a query builder.
+     *
+     * High Risk  : age < 18 OR age > 35
+     * Normal     : age BETWEEN 18 AND 35
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|null $riskStatus
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function applyRiskStatusFilter($query, ?string $riskStatus)
+    {
+        if ($riskStatus === 'high_risk') {
+            $query->where(function ($q) {
+                $q->where('age', '<', 18)
+                  ->orWhere('age', '>', 35);
+            });
+        } elseif ($riskStatus === 'normal') {
+            $query->whereBetween('age', [18, 35]);
+        }
+
+        return $query;
     }
 
     /**
@@ -222,6 +254,9 @@ class PatientRepository implements PatientRepositoryInterface
             },
             'childRecords.immunizations' => function($query) {
                 $query->with('vaccine')->orderBy('schedule_date', 'desc');
+            },
+            'maternalImmunizations' => function($query) {
+                $query->with('vaccineLot')->orderBy('dose_number');
             },
             'activePrenatalRecord',
             'latestCheckup'

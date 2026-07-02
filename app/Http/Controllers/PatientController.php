@@ -50,10 +50,11 @@ class PatientController extends BaseController
 
         // Clean controller - all query logic in repository
         $perPage = 10;
+        $riskStatus = $request->input('risk_status'); // 'high_risk' | 'normal' | null
 
         $patients = $request->filled('search')
-            ? $this->patientRepository->searchPaginated($request->search, $perPage)
-            : $this->patientRepository->paginate($perPage);
+            ? $this->patientRepository->searchPaginated($request->search, $perPage, $riskStatus)
+            : $this->patientRepository->paginate($perPage, $riskStatus);
 
         $patients->withQueryString();
 

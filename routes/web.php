@@ -138,6 +138,22 @@ Route::middleware(['auth'])->group(function () {
             //Vaccine Routes
             Route::resource('vaccines', VaccineController::class);
 
+            // Vaccine Lot (inventory) Routes — midwife only
+            Route::prefix('vaccine-lots')->name('vaccine-lots.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\VaccineLotController::class, 'index'])->name('index');
+                Route::post('/', [\App\Http\Controllers\VaccineLotController::class, 'store'])->name('store');
+                Route::put('/{vaccineLot}', [\App\Http\Controllers\VaccineLotController::class, 'update'])->name('update');
+                Route::get('/available', [\App\Http\Controllers\VaccineLotController::class, 'available'])->name('available');
+            });
+
+            // Maternal Immunization Routes (TDaP for mothers)
+            Route::prefix('patients/{patientId}/maternal-immunizations')
+                 ->name('maternal-immunizations.')
+                 ->group(function () {
+                    Route::post('/', [\App\Http\Controllers\MaternalImmunizationController::class, 'store'])->name('store');
+                    Route::delete('/{doseId}', [\App\Http\Controllers\MaternalImmunizationController::class, 'destroy'])->name('destroy');
+                 });
+
             //Report
             Route::get('/reports', [ReportController::class, 'midwifeIndex'])->name('report');
             Route::get('/reports/print', [ReportController::class, 'printView'])->name('report.print');

@@ -40,14 +40,19 @@ class NotificationServiceTest extends TestCase
     {
         NotificationFacade::fake();
 
-        $prenatalRecord = PrenatalRecord::factory()->create([
+        $prenatalRecord = PrenatalRecord::create([
             'patient_id' => $this->patient->id,
+            'last_menstrual_period' => now()->subDays(60),
+            'status' => 'normal',
         ]);
 
-        $checkup = PrenatalCheckup::factory()->create([
+        $checkup = PrenatalCheckup::create([
             'prenatal_record_id' => $prenatalRecord->id,
+            'patient_id' => $this->patient->id,
             'checkup_date' => now(),
+            'checkup_time' => '08:00:00',
             'next_visit_date' => now()->addDays(30),
+            'status' => 'upcoming',
         ]);
 
         NotificationService::sendAppointmentConfirmation($checkup);
@@ -63,13 +68,19 @@ class NotificationServiceTest extends TestCase
     {
         NotificationFacade::fake();
 
-        $prenatalRecord = PrenatalRecord::factory()->create([
+        $prenatalRecord = PrenatalRecord::create([
             'patient_id' => $this->patient->id,
+            'last_menstrual_period' => now()->subDays(60),
+            'status' => 'normal',
         ]);
 
-        $checkup = PrenatalCheckup::factory()->create([
+        $checkup = PrenatalCheckup::create([
             'prenatal_record_id' => $prenatalRecord->id,
+            'patient_id' => $this->patient->id,
+            'checkup_date' => now(),
+            'checkup_time' => '08:00:00',
             'next_visit_date' => now()->addDay(),
+            'status' => 'upcoming',
         ]);
 
         NotificationService::sendAppointmentReminder($checkup);
@@ -104,7 +115,7 @@ class NotificationServiceTest extends TestCase
 
         $vaccine = Vaccine::factory()->create([
             'current_stock' => 5,
-            'minimum_threshold' => 10,
+            'min_stock' => 10,
         ]);
 
         NotificationService::sendLowStockAlert($vaccine);

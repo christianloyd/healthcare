@@ -28,7 +28,7 @@ class ImmunizationServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new ImmunizationService();
+        $this->service = app(ImmunizationService::class);
 
         // Create test user
         $this->user = User::factory()->create([
@@ -62,6 +62,7 @@ class ImmunizationServiceTest extends TestCase
             'vaccine_id' => $this->vaccine->id,
             'dose' => '1st Dose',
             'schedule_date' => Carbon::now()->addDays(7)->toDateString(),
+            'schedule_time' => '08:00',
         ];
 
         $immunization = $this->service->createImmunization($data);
@@ -82,6 +83,7 @@ class ImmunizationServiceTest extends TestCase
             'vaccine_id' => $this->vaccine->id,
             'dose' => '1st Dose',
             'schedule_date' => Carbon::now()->addDays(7)->toDateString(),
+            'schedule_time' => '08:00',
         ];
 
         $this->service->createImmunization($data);
@@ -99,6 +101,7 @@ class ImmunizationServiceTest extends TestCase
             'vaccine_id' => $this->vaccine->id,
             'dose' => '1st Dose',
             'schedule_date' => Carbon::now()->addDays(7)->toDateString(),
+            'schedule_time' => '08:00',
         ];
 
         $this->expectException(\Exception::class);
@@ -123,6 +126,7 @@ class ImmunizationServiceTest extends TestCase
             'vaccine_id' => $this->vaccine->id,
             'dose' => '1st Dose',
             'schedule_date' => Carbon::now()->addDays(7)->toDateString(),
+            'schedule_time' => '08:00',
         ];
 
         $this->expectException(\Exception::class);
@@ -163,6 +167,7 @@ class ImmunizationServiceTest extends TestCase
             'vaccine_id' => $this->vaccine->id,
             'dose' => '1st Dose',
             'schedule_date' => Carbon::now()->toDateString(),
+            'schedule_time' => '08:00',
             'status' => 'Done',
         ];
 
@@ -187,6 +192,7 @@ class ImmunizationServiceTest extends TestCase
             'vaccine_id' => $this->vaccine->id,
             'dose' => '1st Dose',
             'schedule_date' => Carbon::now()->toDateString(),
+            'schedule_time' => '08:00',
             'status' => 'Done',
         ];
 
